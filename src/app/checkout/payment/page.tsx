@@ -2,10 +2,11 @@
 
 import { useShopStore } from "@/store/useShopStore";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { CheckCircle2, CreditCard, Banknote, QrCode } from "lucide-react";
+import { Suspense } from "react";
 
-export default function PaymentPage() {
+function PaymentContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const orderId = searchParams.get('orderId');
@@ -120,5 +121,17 @@ export default function PaymentPage() {
                 </div>
             )}
         </div>
+    );
+}
+
+export default function PaymentPage() {
+    return (
+        <Suspense fallback={
+            <div className="container py-20 px-4 flex items-center justify-center">
+                <div className="text-muted-foreground">Loading...</div>
+            </div>
+        }>
+            <PaymentContent />
+        </Suspense>
     );
 }
