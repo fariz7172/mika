@@ -1,11 +1,13 @@
 'use client';
 
 import NextImage from "next/image";
+import Link from "next/link";
 import { Product } from "@/types";
 
 import { ShoppingCart, Heart } from "lucide-react";
 import { useShopStore } from "@/store/useShopStore";
 import { cn } from "@/lib/utils";
+import { useSession } from "next-auth/react";
 
 interface ProductCardProps {
     product: Product;
@@ -13,10 +15,25 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
     const { addToCart, addToWishlist, isInWishlist, removeFromWishlist } = useShopStore();
+    const { data: session } = useSession();
 
     const isWishlisted = isInWishlist(product.id);
     const isLowStock = product.stock > 0 && product.stock < 5;
     const isOutOfStock = product.stock === 0;
+
+    const handleAddToCart = () => {
+        // Validation: Admin/Super Admin
+        const role = (session?.user as any)?.role;
+        if (role === 'ADMIN' || role === 'SUPER_ADMIN') {
+            alert("Admin tidak bisa melakukan pembelian barang!");
+            return;
+        }
+
+        const success = addToCart(product);
+        if (!success) {
+            alert("Stok barang tidak mencukupi untuk menambah jumlah!");
+        }
+    };
 
     const toggleWishlist = () => {
         if (isWishlisted) {
@@ -36,7 +53,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
     return (
         <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white transition-all hover:shadow-xl hover:-translate-y-1">
-            <div className="aspect-square bg-slate-50 relative overflow-hidden">
+            <Link href={`/products/${product.id}`} className="aspect-square bg-white relative overflow-hidden block">
                 {/* Category Badge */}
                 {product.category && (
                     <span className="absolute left-3 top-3 z-10 rounded-full bg-white/90 px-3 py-1 text-[10px] font-bold tracking-wider uppercase backdrop-blur-sm text-slate-700 shadow-sm">
@@ -50,7 +67,7 @@ export function ProductCard({ product }: ProductCardProps) {
                         src={product.images}
                         alt={product.name}
                         fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        className="object-contain transition-transform duration-500 group-hover:scale-110"
                     />
                 ) : (
                     <div className="flex h-full w-full items-center justify-center text-slate-300 bg-slate-50 font-medium">
@@ -64,7 +81,7 @@ export function ProductCard({ product }: ProductCardProps) {
                         <span className="bg-slate-900 text-white px-4 py-2 text-xs font-bold rounded-full tracking-wide">STOK HABIS</span>
                     </div>
                 )}
-            </div>
+            </Link>
             <div className="flex flex-1 flex-col p-5">
                 <div className="mb-2">
                     <h3 className="text-base font-bold text-slate-800 line-clamp-1 group-hover:text-indigo-600 transition-colors">{product.name}</h3>
@@ -86,7 +103,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
                     <div className="flex gap-2">
                         <button
-                            onClick={() => addToCart(product)}
+                            onClick={handleAddToCart}
                             disabled={isOutOfStock}
                             className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-slate-200 transition-all hover:bg-indigo-600 hover:shadow-indigo-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                         >

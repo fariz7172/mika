@@ -11,7 +11,7 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json();
-        const { items, total } = body;
+        const { items, total, address, phone } = body;
 
         if (!items || !Array.isArray(items) || items.length === 0) {
             return NextResponse.json({ error: "Invalid items" }, { status: 400 });
@@ -23,6 +23,8 @@ export async function POST(request: Request) {
                 userId: session.user.id,
                 total: total,
                 status: "PENDING",
+                address: address, // Add address
+                phone: phone,     // Add phone
                 items: {
                     create: items.map((item: any) => ({
                         productId: item.id,

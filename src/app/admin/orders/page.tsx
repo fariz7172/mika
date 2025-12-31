@@ -35,6 +35,7 @@ export default async function AdminOrdersPage() {
                         <tr>
                             <th className="px-4 py-3 font-medium">ID Pesanan</th>
                             <th className="px-4 py-3 font-medium">Customer</th>
+                            <th className="px-4 py-3 font-medium">Pengiriman</th>
                             <th className="px-4 py-3 font-medium">Total</th>
                             <th className="px-4 py-3 font-medium">Status</th>
                             <th className="px-4 py-3 font-medium">Tanggal</th>
@@ -49,6 +50,12 @@ export default async function AdminOrdersPage() {
                                     <div>
                                         <p className="font-medium">{order.user.name}</p>
                                         <p className="text-xs text-muted-foreground">{order.user.email}</p>
+                                    </div>
+                                </td>
+                                <td className="px-4 py-3 max-w-xs">
+                                    <div className="text-sm">
+                                        <p className="font-medium line-clamp-2">{order.address || "-"}</p>
+                                        <p className="text-xs text-muted-foreground">{order.phone || "-"}</p>
                                     </div>
                                 </td>
                                 <td className="px-4 py-3 font-semibold">Rp {order.total.toLocaleString('id-ID')}</td>
@@ -80,7 +87,7 @@ export default async function AdminOrdersPage() {
                         ))}
                         {orders.length === 0 && (
                             <tr>
-                                <td colSpan={6} className="px-4 py-16 text-center text-muted-foreground">
+                                <td colSpan={7} className="px-4 py-16 text-center text-muted-foreground">
                                     Belum ada pesanan
                                 </td>
                             </tr>

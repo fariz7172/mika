@@ -21,6 +21,15 @@ export default function CartPage() {
             return;
         }
 
+        // Get address and phone values directly from DOM for simplicity, or use state
+        const addressInput = document.getElementById('address') as HTMLTextAreaElement;
+        const phoneInput = document.getElementById('phone') as HTMLInputElement;
+
+        if (!addressInput.value || !phoneInput.value) {
+            alert("Mohon lengkapi alamat dan nomor telepon!");
+            return;
+        }
+
         setIsCheckingOut(true);
 
         try {
@@ -32,7 +41,9 @@ export default function CartPage() {
                 },
                 body: JSON.stringify({
                     items: cart,
-                    total: total * 1.11 // Including tax
+                    total: total * 1.11, // Including tax
+                    address: addressInput.value,
+                    phone: phoneInput.value
                 })
             });
 
@@ -43,7 +54,8 @@ export default function CartPage() {
             const { order } = await response.json();
 
             clearCart();
-            router.push(`/invoice/${order.id}`);
+            // Redirect to payment page with order ID
+            router.push(`/checkout/payment?orderId=${order.id}`);
         } catch (error) {
             console.error('Checkout error:', error);
             alert('Terjadi kesalahan saat checkout. Silakan coba lagi.');
@@ -123,7 +135,33 @@ export default function CartPage() {
 
                     <div className="lg:col-span-1">
                         <div className="border border-slate-100 rounded-3xl p-6 bg-white shadow-sm sticky top-24">
-                            <h2 className="text-xl font-bold mb-6 text-slate-800">Ringkasan Pesanan</h2>
+                            <h2 className="text-xl font-bold mb-6 text-slate-800">Pengiriman & Kontak</h2>
+                            <div className="space-y-4 mb-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Alamat Lengkap</label>
+                                    <textarea
+                                        className="w-full rounded-md border border-slate-300 p-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                        rows={3}
+                                        placeholder="Jl. Contoh No. 123, Kota..."
+                                        id="address"
+                                        name="address"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Nomor Telepon/WA</label>
+                                    <input
+                                        type="tel"
+                                        className="w-full rounded-md border border-slate-300 p-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                        placeholder="081234567890"
+                                        id="phone"
+                                        name="phone"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <h2 className="text-xl font-bold mb-6 text-slate-800 border-t border-slate-100 pt-6">Ringkasan Pesanan</h2>
                             <div className="space-y-4 mb-8">
                                 <div className="flex justify-between text-slate-600">
                                     <span>Subtotal</span>
